@@ -39,9 +39,11 @@ print(opt)
 
 numb_iters = 200000
 exp_name = 'exp_with_graph_global_new'
+#exp_name = 'exp_demo_D_500000'
 target_set = 'D'
 phase='eval'
 checkpoint = './checkpoints/{}_{}_{}.pth'.format(exp_name, target_set, numb_iters)
+checkpoint = '/Users/gaiera/Code/housegan/house_gan/exp_demo_D_500000.pth'
 os.makedirs("./dump/", exist_ok=True)
 os.makedirs("./output/", exist_ok=True)
 
@@ -71,7 +73,7 @@ def draw_graph(g_true):
     colors = ['black' for u,v in edges]
     weights = [4 for u,v in edges]
 
-    nx.draw(G_true, pos, node_size=1000, node_color=colors_H, font_size=0, font_weight='bold', edges=edges, edge_color=colors, width=weights)
+    nx.draw(G_true, pos, node_size=1000, node_color=colors_H, font_size=0, font_weight='bold', edgelist=edges, edge_color=colors, width=weights)
     plt.tight_layout()
     plt.savefig('./dump/_true_graph.jpg', format="jpg")
     rgb_im = Image.open('./dump/_true_graph.jpg')
@@ -171,13 +173,15 @@ os.makedirs(opt.exp_folder, exist_ok=True)
 
 # Initialize generator and discriminator
 generator = Generator()
-generator.load_state_dict(torch.load(checkpoint))
+generator.load_state_dict(torch.load(checkpoint,map_location=torch.device('cpu')))
 
 # Initialize variables
 cuda = True if torch.cuda.is_available() else False
 if cuda:
     generator.cuda()
-rooms_path = '/local-scratch4/nnauata/autodesk/FloorplanDataset/'
+#rooms_path = '/local-scratch4/nnauata/autodesk/FloorplanDataset/'
+rooms_path = '/Users/gaiera/Code/housegan/house_gan'
+
 
 # Initialize dataset iterator
 fp_dataset_test = FloorplanGraphDataset(rooms_path, transforms.Normalize(mean=[0.5], std=[0.5]), target_set=target_set, split=phase)
